@@ -9,7 +9,7 @@ if (isset($_POST['id'])) {
 
     $id = $_POST['id'];
     $infoReceipt = $receipt->getInfoReceipt($id);
-    $detailReceipt = $receipt->selectReceiptShow($id);
+    $detailReceipt = $receipt->selectDetailReceiptShow($id);
 }
 ?>
 
@@ -24,13 +24,6 @@ if (isset($_POST['id'])) {
                 <h5 class="text-danger">Người nhập:
                     <span class="text-capitalize text-black">
                         <?php echo $infoReceipt['staff']; ?>
-                    </span>
-                </h5>
-            </div>
-            <div class="phoneNumber col-12 mb-3">
-                <h5 class="text-danger">Nhà cung cấp:
-                    <span class="text-capitalize text-black">
-                        <?php echo $infoReceipt['nameSupplier']; ?>
                     </span>
                 </h5>
             </div>
@@ -57,10 +50,11 @@ if (isset($_POST['id'])) {
                 <thead>
                     <tr>
                         <th>Ảnh</th>
-                        <th style="width: 30%;">Tên sản phẩm</th>
-                        <th style="width: 15%;">Giá</th>
-                        <th style="width: 10%;">Size</th>
-                        <th style="width: 10%;">Số lượng</th>
+                        <th style="width: 35%;">Tên sản phẩm</th>
+                        <th style="width: 35%;">Nhà cung cấp</th>
+                        <th style="width: 10%;">Giá</th>
+                        <th style="width: 5%;">Size</th>
+                        <th style="width: 5%;">Số lượng</th>
                         <th>Tổng tiền</th>
                     </tr>
                 </thead>
@@ -79,7 +73,10 @@ if (isset($_POST['id'])) {
                                 <?= $d['productName'] ?>
                             </td>
                             <td>
-                                <?= convertPrice($d['total'] / $d['quantity']) ?>
+                                <?= $d['nameSupplier'] ?>
+                            </td>
+                            <td>
+                                <?= convertPrice($d['pucharsePrice']) ?>
                             </td>
                             <td>
                                 <?= $d['size'] ?>
@@ -88,7 +85,7 @@ if (isset($_POST['id'])) {
                                 <?= $d['quantity'] ?>
                             </td>
                             <td>
-                                <?= convertPrice($d['total']) ?>
+                                <?= convertPrice($d['pucharsePrice'] * $d['quantity']) ?>
                             </td>
                         </tr>
 

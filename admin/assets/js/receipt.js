@@ -26,7 +26,7 @@ $(document).ready(function () {
     // delete receipt
     $(".main-panel").on(
         "click",
-        ".container .info-receipt tbody .fa-trash",
+        ".container .info-receipt tbody .detete-receipt",
         function (e) {
             e.preventDefault();
             var id = $(this).data("id");
@@ -130,38 +130,38 @@ $(document).ready(function () {
         }
     );
 
-    // previous page
-    $(".main-panel").on(
-        "click",
-        ".container .info-receipt .pagination .previous",
-        function (e) {
-            e.preventDefault();
-            var pageCurrent = $(
-                ".container .info-receipt .pagination li.active"
-            ).text();
-            console.log(pageCurrent);
-            if (pageCurrent == 1) {
-                return;
-            }
-            var page = Number(pageCurrent) - 1;
-            swapPage(page);
-        }
-    );
+    // // previous page
+    // $(".main-panel").on(
+    //     "click",
+    //     ".container .info-receipt .pagination .previous",
+    //     function (e) {
+    //         e.preventDefault();
+    //         var pageCurrent = $(
+    //             ".container .info-receipt .pagination li.active"
+    //         ).text();
+    //         console.log(pageCurrent);
+    //         if (pageCurrent == 1) {
+    //             return;
+    //         }
+    //         var page = Number(pageCurrent) - 1;
+    //         swapPage(page);
+    //     }
+    // );
 
-    // next page
-    $(".main-panel").on(
-        "click",
-        ".container .info-receipt .pagination .next",
-        function (e) {
-            e.preventDefault();
-            var pageCurrent = $(
-                ".container .info-receipt .pagination li.active"
-            ).text();
-            alert(pageCurrent)
-            var page = Number(pageCurrent) + 1;
-            // swapPage(page);
-        }
-    );
+    // // next page
+    // $(".main-panel").on(
+    //     "click",
+    //     ".container .info-receipt .pagination .next",
+    //     function (e) {
+    //         e.preventDefault();
+    //         var pageCurrent = $(
+    //             ".container .info-receipt .pagination li.active"
+    //         ).text();
+    //         alert(pageCurrent)
+    //         var page = Number(pageCurrent) + 1;
+    //         // swapPage(page);
+    //     }
+    // );
     // show receipt
     $('.container').on('click', '.table-responsive .fa-eye.show-receipt', function (e) {
         e.preventDefault();

@@ -3,6 +3,7 @@ require_once __DIR__ . "/../../database/database.php";
 require_once __DIR__ . "/../../database/brand.php";
 require_once __DIR__ . "/../../database/product.php";
 require_once __DIR__ . "/../../database/receipt.php";
+require_once __DIR__ . "/../../database/supplier.php";
 require_once __DIR__ . "\\..\\..\\handle.php";
 
 
@@ -12,10 +13,13 @@ $db = new database();
 $brand = new brand($db);
 $product = new product($db);
 $receipt = new receipt($db);
+$supplier = new supplier($db);
 $results = (object) [
     'subBrand' => [],
     'products' => [],
     'size' => [],
+    'detailSup' => [],
+
 ];
 
 if (isset($_POST['get-sub-brand'])) {
@@ -30,6 +34,7 @@ if (isset($_POST['get-sub-brand'])) {
     $result = $product->selectProductByDesignType($subBrands[0]['subBrandName']);
     $results->products = $result;
     $results->size = $product->selectSizeById($results->products[0]["idProduct"]);
+    $results->detailSup = $supplier->selectDetailByProduct($results->products[0]["idProduct"]);
     echo json_encode($results);
     exit();
 }
@@ -39,6 +44,7 @@ if (isset($_POST['get-products'])) {
     $result = $product->selectProductByDesignType($subBrand);
     $results->products = $result;
     $results->size = $product->selectSizeById($results->products[0]["idProduct"]);
+    $results->detailSup = $supplier->selectDetailByProduct($results->products[0]["idProduct"]);
     echo json_encode($results);
     exit();
 }
@@ -46,6 +52,7 @@ if (isset($_POST['get-size'])) {
     $idProduct = $_POST['idProduct'];
     $result = $product->selectSizeById($idProduct);
     $results->size = $result;
+    $results->detailSup = $supplier->selectDetailByProduct($idProduct);
     echo json_encode($results);
     exit();
 }
@@ -75,54 +82,57 @@ if (isset($_POST['addReceipt'])) {
     $idProduct = $_POST['idProduct'];
     $name = $_POST['name'];
     $size = $_POST['size'];
+    $idSupplier = $_POST['supplier'];
+    $namencc = $_POST['nameSupplier'];
     $price = $_POST['price'];
     $quantity = $_POST['quantity'];
     $results = $product->selectImageById($idProduct);
-    $message = addToReceipt($idProduct, $size, $quantity, $price, $name, $results[0]['image']);
+    $message = addToReceipt($idProduct, $idSupplier, $namencc, $size, $quantity, $price, $name, $results[0]['image']);
 
     $response = [
         "message" => $message,
-        "product" => $_SESSION['receipt']['data'][$idProduct . '-' . $size . '-' . $price],
+        "product" => $_SESSION['receipt']['data'][$idProduct . '-' . $size . '-' . $idSupplier],
         'total' => $_SESSION['receipt']['total']
     ];
 
     echo json_encode($response);
     exit();
 }
-function addToReceipt($productId, $size, $quantity, $price, $name, $img)
+function addToReceipt($productId, $idSupplier, $namencc, $size, $quantity, $price, $name, $img)
 {
     if (!isset($_SESSION['receipt'])) {
         $_SESSION['receipt'] = [];
         $_SESSION['receipt']['total'] = 0;
 
     }
-    if (isset($_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $price])) {
-        $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $price]["quantity"] += $quantity;
-        $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $price]["total"] = $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $price]["quantity"] * $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $price]["price"];
+    if (isset($_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $idSupplier])) {
+        $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $idSupplier]["quantity"] += $quantity;
+        $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $idSupplier]["total"] = $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $idSupplier]["quantity"] * $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $idSupplier]["price"];
         $_SESSION['receipt']['total'] += $quantity * $price;
         return "update";
     } else {
         $newItem = [
             "id" => $productId,
+            "idSupplier" => $idSupplier,
             "name" => $name,
+            "namencc" => $namencc,
             "size" => $size,
             "price" => $price,
             "quantity" => $quantity,
             "img" => $img,
             "total" => $price * $quantity,
         ];
-        $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $price] = $newItem;
+        $_SESSION['receipt']['data'][$productId . '-' . $size . '-' . $idSupplier] = $newItem;
         $_SESSION['receipt']['total'] += $price * $quantity;
         return 'new';
     }
 }
 if (isset($_POST['add-list-receipt'])) {
     if (isset($_SESSION['receipt'])) {
-        $idSupplier = $_POST['idSupplier'];
         $idUser = $_SESSION['account_login']['idUser'];
         $staff = $_SESSION['account_login']['fullName'];
         $total = $_SESSION['receipt']['total'];
-        $result = $receipt->insertReceipt($idUser, $staff, $idSupplier, $total);
+        $result = $receipt->insertReceipt($idUser, $staff, $total);
         echo $result;
         exit();
     }
@@ -255,8 +265,36 @@ if (isset($_POST['add-list-receipt'])) {
                 <label for="size-input">Số lượng tồn kho</label>
             </div>
 
+            <div class="form-floating col-12 mb-3">
+                <select class="form-select" id="supplier" aria-label="Floating label select example">
+                    <?php
+                    $result = $supplier->selectDetailByProduct($idProduct);
+                    $i = 0;
+                    foreach ($result as $key => $row) {
+                        if ($i == 0) {
+                            $purchasePrice = $supplier->selectDetailSupplier($row["idSupplier"], $idProduct);
+                            $i++;
+                            ?>
+                            <option value="<?= $row['idSupplier']; ?>" data-price="<?= $row['price']; ?>" selected>
+                                <?= $row['nameSupplier']; ?>
+                            </option>
+
+                            <?php
+                        } else {
+                            ?>
+                            <option value="<?= $row['idSupplier']; ?> " data-price="<?= $row['price']; ?>">
+                                <?= $row['nameSupplier']; ?>
+                            </option>
+                            <?php
+                        }
+                    }
+                    ?>
+                </select>
+                <label for="name-supplier">Nhà cung cấp</label>
+            </div>
             <div class="form-floating col-6 mb-3">
-                <input type="text" class="form-control" id="product-price" placeholder="Giá">
+                <input type="text" class="form-control" id="product-price" placeholder="Giá" readonly
+                    value="<?php echo convertPrice($purchasePrice['price']) ?>">
                 <label for="product-price">Giá</label>
             </div>
             <div class="form-floating col-6 mb-3">
@@ -284,6 +322,7 @@ if (isset($_POST['add-list-receipt'])) {
                 <tr>
                     <th>Tên sản phẩm</th>
                     <th>Hình ảnh</th>
+                    <th>Nhà cung cấp</th>
                     <th>Size</th>
                     <th>Giá</th>
                     <th>Số lượng</th>
@@ -296,7 +335,7 @@ if (isset($_POST['add-list-receipt'])) {
                 if (!isset($_SESSION['receipt']) || empty($_SESSION['receipt'])) {
                     ?>
                     <tr>
-                        <td colspan="7">Chưa có mặt hàng nào</td>
+                        <td colspan="8">Chưa có mặt hàng nào</td>
                     </tr>
                     <?php
                 }
@@ -314,6 +353,9 @@ if (isset($_POST['add-list-receipt'])) {
                                 <img src="<?php echo $image ?>" alt="" width="50" height="50">
                             </td>
                             <td>
+                                <?php echo $item['namencc'] ?>
+                            </td>
+                            <td>
                                 <?php echo $item['size'] ?>
                             </td>
                             <td>
@@ -328,7 +370,7 @@ if (isset($_POST['add-list-receipt'])) {
                             <td>
                                 <div class="action">
                                     <i class="fa fa-trash" id="delete-icon"
-                                        data-id="<?php echo $item['id'] . '-' . $item['size'] . '-' . $item['price'] ?>"></i>
+                                        data-id="<?php echo $item['id'] . '-' . $item['size'] . '-' . $item['idSupplier'] ?>"></i>
                                 </div>
                             </td>
                         </tr>
@@ -341,33 +383,8 @@ if (isset($_POST['add-list-receipt'])) {
         </table>
     </div>
     <form action="" method="post" class="row" id="formAddProduct" enctype="multipart/form-data">
-        <div class="form-floating col-6 mb-3">
-            <select class="form-select" id="supplier" aria-label="Floating label select example">
-                <?php
-                $result = $receipt->getSuppliers();
-                $i = 0;
-                foreach ($result as $key => $row) {
-                    if ($i == 0) {
-                        $i++;
-                        ?>
-                        <option value="<?= $row['idSupplier']; ?>" selected>
-                            <?= $row['nameSupplier']; ?>
-                        </option>
 
-                        <?php
-                    } else {
-                        ?>
-                        <option value="<?= $row['idSupplier']; ?>">
-                            <?= $row['nameSupplier']; ?>
-                        </option>
-                        <?php
-                    }
-                }
-                ?>
-            </select>
-            <label for="name-supplier">Nhà cung cấp</label>
-        </div>
-        <div class="form-floating col-6 mb-3">
+        <div class="form-floating col-12 mb-3">
             <input type="text" class="form-control" id="total-receipt" placeholder="" readonly value="<?php if (isset($_SESSION['receipt'])) {
                 echo convertPrice($_SESSION['receipt']['total']);
             } else {

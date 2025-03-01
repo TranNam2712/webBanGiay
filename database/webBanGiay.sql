@@ -104,7 +104,6 @@ CREATE TABLE `billDetail` (
 CREATE TABLE `receipts` (
   `idReceipt` int PRIMARY KEY AUTO_INCREMENT,
   `idUser` int,
-  `idSupplier` int,
   `staff` varchar(100),
   `totalReceipt` double,
   `statusRemove` int DEFAULT 0,
@@ -119,12 +118,18 @@ CREATE TABLE `suppliers` (
   `statusRemove` int DEFAULT 0,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE `supplierDetail` (
+  `idSupplier` int,
+  `idProduct` int,
+  `price` int
+);
 CREATE TABLE `receiptDetail` (
   `idReceipt` int,
+    `idSupplier` int,
   `idProduct` int,
   `size` int,
   `quantity` int,
-  `total` int
+  `pucharsePrice` int
 );
 CREATE TABLE `userShippingAddress` (
   `idAddress` int PRIMARY KEY AUTO_INCREMENT,
@@ -170,7 +175,7 @@ ALTER TABLE `bills`
 ADD FOREIGN KEY (`idUser`) REFERENCES `users` (`idUser`);
 ALTER TABLE `receipts`
 ADD FOREIGN KEY (`idUser`) REFERENCES `users` (`idUser`);
-ALTER TABLE `receipts`
+ALTER TABLE `receiptDetail`
 ADD FOREIGN KEY (`idSupplier`) REFERENCES `suppliers` (`idSupplier`);
 ALTER TABLE `billDetail`
 ADD FOREIGN KEY (`idBill`) REFERENCES `bills` (`idBill`);
@@ -179,6 +184,10 @@ ADD FOREIGN KEY (`idReceipt`) REFERENCES `receipts` (`idReceipt`);
 ALTER TABLE `billDetail`
 ADD FOREIGN KEY (`idProduct`) REFERENCES `products` (`idProduct`);
 ALTER TABLE `receiptDetail`
+ADD FOREIGN KEY (`idProduct`) REFERENCES `products` (`idProduct`);
+ALTER TABLE `supplierDetail`
+ADD FOREIGN KEY (`idSupplier`) REFERENCES `suppliers` (`idSupplier`);
+ALTER TABLE `supplierDetail`
 ADD FOREIGN KEY (`idProduct`) REFERENCES `products` (`idProduct`);
 ALTER TABLE `userShippingAddress`
 ADD FOREIGN KEY (`idUser`) REFERENCES `users` (`idUser`);
@@ -782,6 +791,111 @@ VALUES (1, 42),
   (40, 37.5),
   (40, 38),
   (40, 40);
+-- insert supplier detail --
+INSERT INTO `supplierdetail` (`idSupplier`, `idProduct`, `price`) VALUES
+(1, 1, 207000000),
+(1, 2, 9081000),
+(1, 3, 54081000),
+(1, 4, 3321000),
+(1, 5, 3051000),
+(1, 6, 2601000),
+
+(1, 12, 1791000),
+(1, 13, 4041000),
+(1, 14, 1971000),
+(1, 15, 3051000),
+(1, 16, 2961000),
+(1, 17, 7110000),
+(1, 18, 7101000),
+
+(1, 23, 2241000),
+(1, 24, 2601000),
+(1, 25, 1251000),
+(1, 26, 1521000),
+(1, 27, 1611000),
+
+(1, 31, 3591000),
+(1, 32, 2871000),
+(1, 33, 1161000),
+(1, 39, 2781000),
+(1, 40, 2781000),
+(2, 1, 184000000),
+(2, 2, 8072000),
+(2, 3, 48072000),
+(2, 4, 2952000),
+(2, 5, 2712000),
+(2, 6, 2312000),
+(2, 7, 5112000),
+(2, 8, 134400000),
+(2, 9, 2072000),
+(2, 10, 151200000),
+(2, 11, 3912000),
+(2, 12, 1592000),
+(2, 13, 3592000),
+(2, 14, 1752000),
+(2, 15, 2712000),
+(2, 16, 2632000),
+(2, 17, 6320000),
+(2, 18, 6312000),
+(2, 19, 8552000),
+(2, 20, 3112000),
+(2, 21, 1200000),
+(2, 22, 1592000),
+(2, 23, 1992000),
+(2, 24, 2312000),
+(2, 25, 1112000),
+(2, 26, 1352000),
+(2, 27, 1432000),
+(2, 28, 2312000),
+(2, 29, 1272000),
+(2, 30, 1192000),
+(2, 31, 3192000),
+(2, 32, 2552000),
+(2, 33, 1032000),
+(2, 34, 3592000),
+(2, 35, 1832000),
+(2, 36, 1272000),
+(2, 37, 1672000),
+(2, 38, 1752000),
+(2, 39, 2472000),
+(2, 40, 2472000),
+(3, 2, 8576500),
+(3, 4, 3136500),
+(3, 6, 2456500),
+(3, 8, 142800000),
+(3, 10, 160650000),
+(3, 12, 1691500),
+(3, 14, 1861500),
+(3, 16, 2796500),
+(3, 18, 6706500),
+(3, 28, 2456500),
+(3, 30, 1266500),
+(3, 32, 2711500),
+(3, 34, 3816500),
+(3, 36, 1351500),
+(3, 38, 1861500),
+(3, 40, 2626500),
+(4, 1, 195500000),
+(4, 3, 51076500),
+(4, 5, 2881500),
+(4, 7, 5431500),
+(4, 9, 2201500),
+(4, 11, 4156500),
+(4, 13, 3816500),
+(4, 15, 2881500),
+(4, 17, 6715000),
+(4, 19, 9086500),
+(4, 21, 1275000),
+(4, 23, 2116500),
+(4, 25, 1181500),
+(4, 27, 1521500),
+(4, 29, 1351500),
+(4, 31, 3391500),
+(4, 33, 1096500),
+(4, 35, 1946500),
+(4, 37, 1776500),
+(4, 39, 2626500);
+
 -- insert data imageProducts--
 INSERT INTO imageProducts (idProduct, image)
 VALUES (1, './image/products/1.webp'),

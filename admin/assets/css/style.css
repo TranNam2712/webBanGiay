@@ -16,6 +16,7 @@
   }
 
   .info-product,
+  .info-supplier-detail,
   .info-collection,
   .info-receipt {
     margin: 50px auto;
@@ -349,8 +350,16 @@
 
 .import-products {
   .table-responsive {
+    th:nth-child(1) {
+      width: 20%;
+    }
+
     th:nth-child(2) {
-      width: 15%;
+      width: 10%;
+    }
+
+    th:nth-child(3) {
+      width: 20%;
     }
 
     td {
@@ -388,7 +397,7 @@
 
 .container .info-supplier {
   .table-responsive {
-    .th {
+    th {
       text-align: center;
 
     }
@@ -413,6 +422,46 @@
     th:nth-child(5) {
       width: 15%;
     }
-  }
 
+    .container .info-receipt {
+      .table-responsive {
+        th {
+          text-align: center;
+
+        }
+
+
+        th:nth-child(1) {
+          width: 40%;
+        }
+
+        th:nth-child(2) {
+          width: 40%;
+        }
+
+        th:nth-child(3) {
+          width: 20%;
+        }
+      }
+
+
+    }
+  }
+}
+
+.container {
+
+  .info-supplier-detail {
+    & .product-tools {
+      .show {
+        span {
+          width: 80%;
+        }
+
+        width: 50%;
+        /* display: flex; */
+        align-items: center;
+      }
+    }
+  }
 }

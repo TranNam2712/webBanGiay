@@ -24,21 +24,21 @@ class receipt
         return $this->db->selectAll($sql);
     }
 
-    public function selectReceiptShow($idReceipt)
+    public function selectDetailReceiptShow($idReceipt)
     {
-        $sql = "SELECT *
-            FROM ReceiptS JOIN ReceiptDETAIL ON ReceiptS.IDReceipt = ReceiptDETAIL.IDReceipt
-            JOIN PRODUCTS ON ReceiptDETAIL.IDPRODUCT = PRODUCTS.IDPRODUCT
+        $sql = "SELECT * from
+            ReceiptDETAIL JOIN PRODUCTS ON ReceiptDETAIL.IDPRODUCT = PRODUCTS.IDPRODUCT
             JOIN IMAGEPRODUCTS ON PRODUCTS.IDPRODUCT = IMAGEPRODUCTS.IDPRODUCT
-            WHERE ReceiptS.IDReceipt = $idReceipt
+            JOIN SUPPLIERS ON ReceiptDetail.IDSUPPLIER = SUPPLIERS.IDSUPPLIER 
+            WHERE ReceiptDETAIL.IDReceipt = $idReceipt
             GROUP BY PRODUCTS.idProduct, Receiptdetail.size";
         return $this->db->selectAll($sql);
     }
 
-    public function insertReceipt($idUser, $staff, $idSuppiler, $total)
+    public function insertReceipt($idUser, $staff, $total)
     {
         // insert Receipt
-        $sql = "INSERT INTO ReceiptS (idUser, idSupplier, staff,totalReceipt) VALUES ($idUser, $idSuppiler, '$staff', $total)";
+        $sql = "INSERT INTO ReceiptS (idUser, staff,totalReceipt) VALUES ($idUser, '$staff', $total)";
         $idReceipt = $this->db->insert($sql);
         if (!$idReceipt) {
             return "Lỗi: Không thể tạo Receipt.";
@@ -51,10 +51,11 @@ class receipt
             foreach ($_SESSION['receipt']['data'] as $key => $item) {
                 $idProduct = $item['id'];
                 $size = $item['size'];
+                $idSupplier = $item['idSupplier'];
                 $quantity = $item['quantity'];
                 $total = $item['total'];
                 $price = $total / $quantity;
-                $sql = "INSERT INTO ReceiptDETAIL (idReceipt, idProduct, size, quantity, total) VALUES ($idReceipt, $idProduct, $size, $quantity, $total)";
+                $sql = "INSERT INTO ReceiptDETAIL (idReceipt,idSupplier,idProduct, size, quantity, pucharsePrice) VALUES ($idReceipt,$idSupplier, $idProduct, $size, $quantity, $price)";
                 $this->db->insert($sql);
                 $sql = "UPDATE SIZEPRODUCTS SET QUANTITYREMAIN = QUANTITYREMAIN + $quantity 
                 WHERE SIZEPRODUCTS.SIZE = $size AND SIZEPRODUCTS.IDPRODUCT=$idProduct";
@@ -75,7 +76,6 @@ class receipt
     public function getInfoReceipt($idReceipt)
     {
         $sql = "SELECT * FROM ReceiptS 
-        JOIN SUPPLIERS ON ReceiptS.IDSUPPLIER = SUPPLIERS.IDSUPPLIER 
         WHERE idReceipt = $idReceipt";
         return $this->db->selectAll($sql)->fetch_assoc();
     }

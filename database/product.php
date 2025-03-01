@@ -85,7 +85,20 @@ class product
                     ON products.idProduct = imageproducts.idProduct
                     WHERE designType = '$type'
                     GROUP BY products.idProduct
-                    ORDER BY products.idProduct DESC LIMIT 4";
+                    ORDER BY products.idProduct DESC";
+        $result = $this->db->selectAll($sql);
+        $products = [];
+        while ($row = $result->fetch_assoc()) {
+            $products[] = $row;
+        }
+        return $products;
+    }
+    public function selectProductByDesignTypeSupplier($type, $idSupplier)
+    {
+        $sql = "SELECT p.*
+                FROM products p
+                LEFT JOIN supplierDetail s ON p.idProduct = s.idProduct AND s.idSupplier = $idSupplier
+                WHERE s.idProduct IS NULL AND p.designType = '$type'";
         $result = $this->db->selectAll($sql);
         $products = [];
         while ($row = $result->fetch_assoc()) {
@@ -230,6 +243,16 @@ class product
     public function pagination($itemOfPage, $valueSearch)
     {
         $sql = "SELECT * FROM products WHERE STATUS = 1";
+        if ($valueSearch != "") {
+            $sql .= "  AND productName like '%$valueSearch%'";
+        }
+        $items = $this->db->selectAll($sql)->num_rows;
+        $page = ceil($items / $itemOfPage);
+        return $page;
+    }
+    public function paginationInSupplier($itemOfPage, $valueSearch, $idSupplier)
+    {
+        $sql = "SELECT * FROM supplierDetail join products on supplierDetail.idproduct = products.idProduct WHERE idSupplier = $idSupplier  and STATUS =1";
         if ($valueSearch != "") {
             $sql .= "  AND productName like '%$valueSearch%'";
         }

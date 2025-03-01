@@ -417,6 +417,11 @@ if (isset($_SESSION['account_login'])) {
                                             <span class="sub-item">Thông tin nhà cung cấp</span>
                                         </a>
                                     </li>
+                                    <li>
+                                        <a href="./gui/infoSupplierDetail.php">
+                                            <span class="sub-item">Thông tin chi tiết nhà cung cấp</span>
+                                        </a>
+                                    </li>
                                     <?php
                                 }
                                 ?>
@@ -427,6 +432,11 @@ if (isset($_SESSION['account_login'])) {
                                     <li>
                                         <a href="./gui/addSupplier.php">
                                             <span class="sub-item">Thêm nhà cung</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="./gui/addSupplierDetail.php">
+                                            <span class="sub-item">Thêm chi tiết nhà cung cấp</span>
                                         </a>
                                     </li>
 

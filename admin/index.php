@@ -36,7 +36,7 @@ if (!isset($_SESSION['account_login'])) {
                 ],
                 urls: ["assets/css/fonts.min.css"],
             },
-            active: function() {
+            active: function () {
                 sessionStorage.fonts = true;
             },
         });
@@ -270,6 +270,7 @@ if (!isset($_SESSION['account_login'])) {
     <script src="assets/js/role.js"></script>
     <script src="assets/js/addRole.js"></script>
     <script src="assets/js/addSupplier.js"></script>
+    <script src="assets/js/addSupplierDetail.js"></script>
     <script src="assets/js/staff.js"></script>
     <script src="assets/js/addStaff.js"></script>
     <script type="module" src="assets/js/order.js"></script>
@@ -279,6 +280,7 @@ if (!isset($_SESSION['account_login'])) {
     <script src="assets/js/importProduct.js"></script>
     <script src="assets/js/receipt.js"></script>
     <script src="assets/js/supplier.js"></script>
+    <script src="assets/js/supplierDetail.js"></script>
     <script src="assets/js/subBrand.js"></script>
 
     <script>
